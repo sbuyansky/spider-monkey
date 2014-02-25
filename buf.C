@@ -91,7 +91,9 @@ const Status BufMgr::allocBuf(int & frame)
 				if(curDesc->pinCnt == 0){
 					if(curDesc->dirty){
 						//flush page to disk
-						curDesc->file->writePage(curDesc->pageNo, &(bufPool[clockHand]));
+						if(curDesc->file->writePage(curDesc->pageNo, &(bufPool[clockHand]))!= OK){
+							return UNIXERR;
+						}
 					}
 					//use the page
 					frame = clockHand;
