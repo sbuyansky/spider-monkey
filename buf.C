@@ -130,10 +130,23 @@ const Status BufMgr::unPinPage(File* file, const int PageNo,
 
 const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page) 
 {
+	//allocate a page
+	if(file->allocatePage(pageNo) != OK){
+		cout <<"BufMgr::allocPage, error allocating a page in file" <<endl;
+	}
+	int frameNo = 0;
 
+	Status s = allocBuf(frameNo);
+	if(s == OK){
+		//insert into hashtable
+		if(hashTable->insert(file, pageNo, frameNo) != OK){
+			return HASHTBLERROR;
+		}
+		//invoke set on the new frame
+		bufTable[frameNo].Set(file, pageNo);
+	}
 
-
-
+	return s;
 }
 
 const Status BufMgr::disposePage(File* file, const int pageNo) 
