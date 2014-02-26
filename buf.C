@@ -116,6 +116,7 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 	int frameNum = -1;
 	Status lookSt = hashTable->lookup(file, PageNo, frameNum);
 	if(lookSt == HASHNOTFOUND) {
+		cout << "readPage:page does not exist in hashtable" <<endl;
 		// page not in buffer pool, so allocating a new page
 		Status allocSt = allocBuf(frameNum);
 		if(allocSt == UNIXERR) {
@@ -155,9 +156,10 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 	} else if(lookSt == OK) {
 		// found page in pool
 		// set refbit and pinCount
+		cout << "readPage:page exists in hashtable" <<endl;
 		bufTable[PageNo].refbit = true;
 		bufTable[PageNo].pinCnt++;
-		page = &bufPool[frameNum];
+		page = &(bufPool[frameNum]);
 		return OK;
 
 	} else {
