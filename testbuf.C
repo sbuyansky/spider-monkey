@@ -105,6 +105,7 @@ int main()
     for (i = 0; i < num; i++) {
       CALL(bufMgr->readPage(file1, j[i], page));
       sprintf((char*)&cmp, "test.1 Page %d %7.1f", j[i], (float)j[i]);
+	  printf("%s\n",cmp);
       ASSERT(memcmp(page, &cmp, strlen((char*)&cmp)) == 0);
       CALL(bufMgr->unPinPage(file1, j[i], false));
     }
