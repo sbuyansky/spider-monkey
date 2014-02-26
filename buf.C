@@ -65,7 +65,7 @@ BufMgr::~BufMgr() {
 
 const Status BufMgr::allocBuf(int & frame) 
 {
-
+	return OK;
 
 
 
@@ -76,7 +76,7 @@ const Status BufMgr::allocBuf(int & frame)
 	
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
-
+	return OK;
 
 
 
@@ -87,18 +87,29 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 const Status BufMgr::unPinPage(File* file, const int PageNo, 
 			       const bool dirty) 
 {
+	int frameNo = 0;
+	if(hashTable->lookup(file, PageNo, frameNo) != HASHNOTFOUND){
+		if(bufTable[frameNo].pinCnt == 0){
+			return PAGENOTPINNED;
+		}
+		else{
+			bufTable[frameNo].pinCnt--;
+		}
 
-
-
-
+		if(dirty == true){
+			bufTable[frameNo].dirty = true;
+		}
+	}
+	else{
+		return HASHNOTFOUND;
+	}
+	return OK;
 
 }
 
 const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page) 
 {
-
-
-
+	return OK;
 
 
 
