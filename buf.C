@@ -78,6 +78,7 @@ const Status BufMgr::allocBuf(int & frame)
 		//if not valid return that frame
 		if(!curDesc->valid){
 			frame = clockHand;
+			curDesc->Clear();
 			return OK;
 		}
 		//if valid
@@ -97,6 +98,7 @@ const Status BufMgr::allocBuf(int & frame)
 						}
 					}
 					//use the page
+					curDesc->Clear();
 					frame = clockHand;
 					return OK;
 				}
