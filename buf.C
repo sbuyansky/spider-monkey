@@ -158,8 +158,8 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 		// found page in pool
 		// set refbit and pinCount
 		cout << "readPage:page exists in hashtable" <<endl;
-		bufTable[PageNo].refbit = true;
-		bufTable[PageNo].pinCnt++;
+		bufTable[frameNum].refbit = true;
+		bufTable[frameNum].pinCnt++;
 		page = &(bufPool[frameNum]);
 		return OK;
 
@@ -176,7 +176,7 @@ const Status BufMgr::unPinPage(File* file, const int PageNo,
 							   const bool dirty) 
 {
 	cout << "unPinPage" << endl;
-	int frameNo = 0;
+	int frameNo = -1;
 	if(hashTable->lookup(file, PageNo, frameNo) != HASHNOTFOUND){
 		if(bufTable[frameNo].pinCnt == 0){
 			return PAGENOTPINNED;
