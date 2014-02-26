@@ -65,7 +65,7 @@ BufMgr::~BufMgr() {
 
 const Status BufMgr::allocBuf(int & frame) 
 {
-	int initialClockPos = clockHand;
+	unsigned int initialClockPos = clockHand;
 	advanceClock();
 
 	BufDesc * curDesc = NULL;
