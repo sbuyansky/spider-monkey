@@ -213,10 +213,15 @@ const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page)
 		}
 		//invoke set on the new frame
 		bufTable[frameNo].Set(file, pageNo);
+
+		//return pointer to buffer frame allocated for the page
+		//do not know if this is correct
+
+		file->readPage(pageNo, &bufPool[frameNo]);
+
+		page =  &bufPool[frameNo];
 	}
-	//return pointer to buffer frame allocated for the page
-	//do not know if this is correct
-	page->init(pageNo);
+
 	return s;
 }
 
