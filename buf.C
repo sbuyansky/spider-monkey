@@ -68,7 +68,6 @@ const Status BufMgr::allocBuf(int & frame)
 #ifdef DEBUG
 	cout << "allocBuf" << endl;
 #endif
-	unsigned int initialClockPos = clockHand;
 	advanceClock();
 
 	int pinnedPagesCount = 0;
