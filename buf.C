@@ -113,36 +113,36 @@ const Status BufMgr::allocBuf(int & frame)
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
 
-	int* frameNum = new int;
-	Status lookSt = hashtable -> lookup(file, PageNo, frameNum);
-	if(lookSt == Status.HASHNOTFOUND) {
+	int frameNum = -1;
+	Status lookSt = hashTable->lookup(file, PageNo, frameNum);
+	if(lookSt == HASHNOTFOUND) {
 		// page not in buffer pool, so allocating a new page
 		Status allocSt = allocBuf(frameNum);
-		if(allocSt == Status.UNIXERR) {
-			return Status.UNIXERR;
-		} else if(allocSt == Status.BUFFEREXCEEDED) {
-			return Status.BUFFEREXCEEDED;
-		} else if(allocSt == Status.OK) {
+		if(allocSt == UNIXERR) {
+			return UNIXERR;
+		} else if(allocSt == BUFFEREXCEEDED) {
+			return BUFFEREXCEEDED;
+		} else if(allocSt == OK) {
 			// page has been allocated
 			// call the method file->readPage() to read the page from disk into the buffer pool frame
-			Status readSt = readPage(pageNo, page);
-			if(readSt == Status.BADPAGEPTR) {
+			Status readSt = readPage(file, PageNo, page);
+			if(readSt == BADPAGEPTR) {
 				//TODO
-			} else if(readSt == Status.BADPAGENO) {
+			} else if(readSt == BADPAGENO) {
 				//TODO
-			} else if(readSt == Status.UNIXERR) {
-				return Status.UNIXERR;
-			} else if(readSt == Status.OK) {
+			} else if(readSt == UNIXERR) {
+				return UNIXERR;
+			} else if(readSt == OK) {
 				// insert the page into the hashtable
-				Status insertSt = insert(file, pageNo, frameNum);
-				if(Status != Status.OK) {
+				Status insertSt = hashTable->insert(file, PageNo, frameNum);
+				if(insertSt != OK) {
 					// invoke Set() on the frame to set it up properly. Set() will leave the pinCnt for the page set to 1.
 					bufTable[frameNum].Set(file, PageNo);
 					// return a pointer to the frame containing the page via the page parameter
-					return Status.OK;
-					
+					return OK;
+
 				} else {
-					return Status.HASHTBLERROR;
+					return HASHTBLERROR;
 				}
 			} else {
 				// should not reach here
@@ -152,13 +152,13 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 			// should not reach here
 			cout << "Error occurred: allocBuf didn't return valid Status";
 		}
-	} else if(lookSt == Status.OK) {
+	} else if(lookSt == OK) {
 		// found page in pool
 		// set refbit and pinCount
 		bufTable[PageNo].refbit = true;
 		bufTable[PageNo].pinCnt++;
-		return Status.OK;
-	
+		return OK;
+
 	} else {
 		// should not reach here
 		cout << "Error occurred: lookup didn't return valid Status";
@@ -209,7 +209,9 @@ const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page)
 		//invoke set on the new frame
 		bufTable[frameNo].Set(file, pageNo);
 	}
-
+	//return pointer to buffer frame allocated for the page
+	//do not know if this is correct
+	page->init(pageNo);
 	return s;
 }
 
