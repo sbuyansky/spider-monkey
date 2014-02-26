@@ -164,8 +164,7 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 		cout << "Error occurred: lookup didn't return valid Status";
 	}
 
-
-
+	return OK;
 }
 
 
