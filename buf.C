@@ -65,7 +65,9 @@ BufMgr::~BufMgr() {
 
 const Status BufMgr::allocBuf(int & frame) 
 {
+#ifdef DEBUG
 	cout << "allocBuf" << endl;
+#endif
 	unsigned int initialClockPos = clockHand;
 	advanceClock();
 
@@ -123,11 +125,15 @@ const Status BufMgr::allocBuf(int & frame)
 
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
+#ifdef DEBUG
 	cout << "readPage" << endl;
+#endif
 	int frameNum = -1;
 	Status lookSt = hashTable->lookup(file, PageNo, frameNum);
 	if(lookSt == HASHNOTFOUND) {
+#ifdef DEBUG
 		cout << "readPage:page does not exist in hashtable" <<endl;
+#endif
 		// page not in buffer pool, so allocating a new page
 		Status allocSt = allocBuf(frameNum);
 		if(allocSt == UNIXERR) {
@@ -168,7 +174,9 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 	} else if(lookSt == OK) {
 		// found page in pool
 		// set refbit and pinCount
+#ifdef DEBUG
 		cout << "readPage:page exists in hashtable" <<endl;
+#endif
 		bufTable[frameNum].refbit = true;
 		bufTable[frameNum].pinCnt++;
 		page = &(bufPool[frameNum]);
@@ -186,7 +194,9 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 const Status BufMgr::unPinPage(File* file, const int PageNo, 
 							   const bool dirty) 
 {
+#ifdef DEBUG
 	cout << "unPinPage" << endl;
+#endif
 	int frameNo = -1;
 	if(hashTable->lookup(file, PageNo, frameNo) != HASHNOTFOUND){
 		if(bufTable[frameNo].pinCnt == 0){
@@ -209,7 +219,9 @@ const Status BufMgr::unPinPage(File* file, const int PageNo,
 
 const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page) 
 {
+#ifdef DEBUG
 	cout << "allocPage" << endl;
+#endif
 	//allocate a page
 	if(file->allocatePage(pageNo) != OK){
 		cout <<"BufMgr::allocPage, error allocating a page in file" <<endl;
