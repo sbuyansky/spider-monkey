@@ -157,6 +157,7 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 		// set refbit and pinCount
 		bufTable[PageNo].refbit = true;
 		bufTable[PageNo].pinCnt++;
+		page = &bufPool[frameNum];
 		return OK;
 
 	} else {
