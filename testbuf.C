@@ -127,6 +127,8 @@ int main()
       pageno = j[random() % num];
       CALL(bufMgr->readPage(file1, pageno, page));
       sprintf((char*)&cmp, "test.1 Page %d %7.1f", pageno, (float)pageno);
+	  	  printf("%s\n",cmp);
+	  printf("%s\n",(char *) page);
       ASSERT(memcmp(page, &cmp, strlen((char*)&cmp)) == 0);
       cout << (char*)page << endl;
       CALL(bufMgr->readPage(file2, pageno2, page2));

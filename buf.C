@@ -99,6 +99,9 @@ const Status BufMgr::allocBuf(int & frame)
 							return UNIXERR;
 						}
 					}
+					//remove from hashtable
+					hashTable->remove(curDesc->file, curDesc->pageNo);
+
 					//use the page
 					curDesc->Clear();
 					frame = clockHand;
@@ -134,7 +137,7 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 		} else if(allocSt == OK) {
 			// page has been allocated
 			// call the method file->readPage() to read the page from disk into the buffer pool frame
-			Status readSt = readPage(file, PageNo, page);
+			Status readSt = file->readPage(PageNo,&bufPool[frameNum]);
 			if(readSt == BADPAGEPTR) {
 				//TODO
 			} else if(readSt == BADPAGENO) {
@@ -144,9 +147,10 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 			} else if(readSt == OK) {
 				// insert the page into the hashtable
 				Status insertSt = hashTable->insert(file, PageNo, frameNum);
-				if(insertSt != OK) {
+				if(insertSt == OK) {
 					// invoke Set() on the frame to set it up properly. Set() will leave the pinCnt for the page set to 1.
 					bufTable[frameNum].Set(file, PageNo);
+					page = &bufPool[frameNum];
 					// return a pointer to the frame containing the page via the page parameter
 					return OK;
 
