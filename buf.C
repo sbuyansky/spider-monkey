@@ -65,6 +65,7 @@ BufMgr::~BufMgr() {
 
 const Status BufMgr::allocBuf(int & frame) 
 {
+	cout << "allocBuf" << endl;
 	unsigned int initialClockPos = clockHand;
 	advanceClock();
 
@@ -112,7 +113,7 @@ const Status BufMgr::allocBuf(int & frame)
 
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
-
+	cout << "readPage" << endl;
 	int frameNum = -1;
 	Status lookSt = hashTable->lookup(file, PageNo, frameNum);
 	if(lookSt == HASHNOTFOUND) {
@@ -174,6 +175,7 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 const Status BufMgr::unPinPage(File* file, const int PageNo, 
 							   const bool dirty) 
 {
+	cout << "unPinPage" << endl;
 	int frameNo = 0;
 	if(hashTable->lookup(file, PageNo, frameNo) != HASHNOTFOUND){
 		if(bufTable[frameNo].pinCnt == 0){
@@ -196,6 +198,7 @@ const Status BufMgr::unPinPage(File* file, const int PageNo,
 
 const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page) 
 {
+	cout << "allocPage" << endl;
 	//allocate a page
 	if(file->allocatePage(pageNo) != OK){
 		cout <<"BufMgr::allocPage, error allocating a page in file" <<endl;
