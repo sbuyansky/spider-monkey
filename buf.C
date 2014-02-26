@@ -69,11 +69,13 @@ const Status BufMgr::allocBuf(int & frame)
 	unsigned int initialClockPos = clockHand;
 	advanceClock();
 
+	int pinnedPagesCount = 0;
+
 	BufDesc * curDesc = NULL;
 
 	//loop around the clock until you reach
 	//the original position of the clockhand
-	while(initialClockPos != clockHand){
+	while(pinnedPagesCount < this->numBufs){
 		curDesc = &bufTable[clockHand];
 		//if not valid return that frame
 		if(!curDesc->valid){
@@ -101,6 +103,9 @@ const Status BufMgr::allocBuf(int & frame)
 					curDesc->Clear();
 					frame = clockHand;
 					return OK;
+				}
+				else{
+					pinnedPagesCount++;
 				}
 			}
 		}
