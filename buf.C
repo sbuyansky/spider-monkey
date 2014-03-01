@@ -1,3 +1,14 @@
+/*
+Team Skrentny
+Connor Zarecki		<zarecki>	9063430798
+Ryan Nie			<shuai>		9066285421
+Spencer Buyansky	<buyansky>	9066247777
+
+This file implements the buffer manager, making all necessary changes to the
+data in the buffer pool so that data can be transfered between main memory and
+disk.
+*/
+
 #include <memory.h>
 #include <unistd.h>
 #include <errno.h>
@@ -62,7 +73,16 @@ BufMgr::~BufMgr() {
 	delete [] bufPool;
 }
 
-
+/*
+Allocates a free frame using the clock algorithm; if necessary, writing a dirty
+page back to disk. Returns BUFFEREXCEEDED if all buffer frames are pinned,
+UNIXERR if the call to the I/O layer returned an error when a dirty page was
+being written to disk and OK otherwise.  This private method will get called by
+the readPage() and allocPage() methods described below.
+If the buffer frame allocated has a valid page in it, it will remove the
+appropriate entry from the hash table.
+frame has the index of the frame number freed.
+*/
 const Status BufMgr::allocBuf(int & frame) 
 {
 #ifdef DEBUG
@@ -121,7 +141,18 @@ const Status BufMgr::allocBuf(int & frame)
 	return BUFFEREXCEEDED;
 }
 
-
+/*
+Tries to read a specific page of the file. If the file is in the hashtable
+already, it just sets the reference bit and increments the pin count. If it
+isn't in the table, it gets a new frame and reads the page into memory, finally
+setting the page count to 1.
+file is the disk file to be read into the hashtable
+PageNo the page of the file to read
+page the appropriate page in the that was requested
+Returns OK if no errors occurred, UNIXERR if a Unix error occurred,
+BUFFEREXCEEDED if all buffer frames are pinned, HASHTBLERROR if a hash table
+error occurred.
+*/
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
 #ifdef DEBUG
@@ -189,7 +220,15 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 	return OK;
 }
 
-
+/*
+Decrements the pinCnt of the frame containing (file, PageNo) and, if
+dirty == true, sets the dirty bit.
+file is the disk file with the page
+PageNo is the page to unpin
+dirty if true, sets the dirty bit in the table
+Returns OK if no errors occurred, HASHNOTFOUND if the page is not in the buffer
+pool hash table, PAGENOTPINNED if the pin count is already 0.
+*/
 const Status BufMgr::unPinPage(File* file, const int PageNo, 
 							   const bool dirty) 
 {
@@ -216,6 +255,19 @@ const Status BufMgr::unPinPage(File* file, const int PageNo,
 
 }
 
+/*
+Creates a new page in the file for the storage of more data. It first allocates
+an empty page in the specified file by invoking file->allocatePage(). This
+returns the page number of the newly allocated page. allocBuf() is called to
+obtain a buffer pool frame. Next, an entry is inserted into the hash table and
+Set() is invoked on the frame to set it up properly.
+file the file to create a new page on
+pageNO the page number of the newly allocated page
+page a pointer to the buffer frame allocated for the page
+Returns OK if no errors occurred, UNIXERR if a Unix error occurred,
+BUFFEREXCEEDED if all buffer frames are pinned and HASHTBLERROR if a hash table
+error occurred. 
+*/
 const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page) 
 {
 #ifdef DEBUG
